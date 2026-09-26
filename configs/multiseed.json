@@ -1,0 +1,21 @@
+{
+    "models": ["simple", "stronger"],
+    "training_seeds": [42, 123, 456, 777],
+    "root": "runs/multiseed",
+    "experiment_name": "experiment1",
+
+    "train": {
+        "split_seed": 42,
+        "epochs": 30,
+        "batch_size": 64,
+        "learning_rate": 0.03,
+        "momentum": 0.9,
+        "device": "cpu"
+    },
+
+    "eval": {
+        "conditions": ["clean", "blur", "noise"],
+        "noise_seed": 42,
+        "std": 0.1
+    }
+}

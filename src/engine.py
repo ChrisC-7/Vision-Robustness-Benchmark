@@ -17,13 +17,24 @@ from torch.utils.data import DataLoader
 @dataclass(frozen=True)
 class TrainConfig:
     model_name: str
-    seed: int = 42
+    training_seed: int = 42
+    split_seed: int = 42
     batch_size: int = 64
     learning_rate: float = 0.03
     momentum: float = 0.9
     epochs: int = 5
     device: str = "cpu"
 
+
+@dataclass(frozen=True)
+class EvalConfig:
+    conditions: tuple[str, ...] = ("clean", "blur", "noise")
+    kernel_size: int = 5
+    noise_seed: int = 42
+    mean: float = 0.0
+    std: float = 0.10
+    batch_size: int = 64
+    device: str = "cpu"
 
 class EpochMetrics(NamedTuple):
     epoch: int
@@ -62,8 +73,8 @@ def train_one_epoch(
 
 def evaluate(
     model: nn.Module,
-    dataloader: DataLoader,
-    loss_fn: nn.Module,
+    dataloader: DataLoader, 
+    loss_fn: nn.Module, 
     device: str
 ) -> tuple[float, float]:
     model.eval()

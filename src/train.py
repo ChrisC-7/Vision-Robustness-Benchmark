@@ -8,7 +8,8 @@ def get_train_CLI():
     parser.add_argument("--model", default='simple')
     parser.add_argument("--run-name", required=True)
     parser.add_argument("--epochs", type = int)
-    parser.add_argument("--seed", type=int)
+    parser.add_argument("--training-seed", type=int)
+    parser.add_argument("--split-seed", type=int)
     parser.add_argument("--batch-size", type = int)
     parser.add_argument("--learning-rate", type = float)
     parser.add_argument("--momentum", type = float)
@@ -32,3 +33,4 @@ def get_train_CLI():
 
 if __name__ == "__main__":
     get_train_CLI()
+

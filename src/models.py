@@ -56,5 +56,10 @@ def build_model(name: str) -> nn.Module:
 
 def load_model(name: str, load_path: str, device = 'cpu') -> nn.Module:
     model = build_model(name)
-    model.load_state_dict(torch.load(load_path, map_location=device, weights_only=True))
-    return model
+    state_dict = torch.load(
+        load_path,
+        map_location=device,
+        weights_only=True,
+    )
+    model.load_state_dict(state_dict)
+    return model.to(device)

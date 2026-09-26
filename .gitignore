@@ -10,3 +10,9 @@ data/
 
 checkpoints/
 runs/
+
+# Tracking DB
+*.db
+
+# Secrets
+.env

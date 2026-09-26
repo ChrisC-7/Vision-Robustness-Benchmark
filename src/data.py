@@ -38,8 +38,8 @@ class GaussianNoise:
         return torch.clamp(img + noise, min=0, max=1)
 
 
-def gaussian_noise_transform(seed: int, mean: float = 0.0, std: float = 0.10) -> Callable:
-    generator = torch.Generator().manual_seed(seed)
+def gaussian_noise_transform(noise_seed: int, mean: float = 0.0, std: float = 0.10) -> Callable:
+    generator = torch.Generator().manual_seed(noise_seed)
     return transforms.Compose(
         [
             transforms.ToTensor(),
@@ -55,7 +55,7 @@ _TRANSFORMS = {
 
 
 def get_train_val_dataloaders(
-    root: str = "data", seed: int = 42, batch_size: int = 64
+    root: str = "data", training_seed: int = 42, split_seed: int = 42, batch_size: int = 64
 ) -> tuple[DataLoader, DataLoader]:
     cifar_train = datasets.CIFAR10(
         root=root,
@@ -64,8 +64,8 @@ def get_train_val_dataloaders(
         download=True,
     )
 
-    split_generator = torch.Generator().manual_seed(seed)
-    shuffle_generator = torch.Generator().manual_seed(seed)
+    split_generator = torch.Generator().manual_seed(split_seed)
+    shuffle_generator = torch.Generator().manual_seed(training_seed)
 
     train_data, val_data = random_split(cifar_train, [0.9, 0.1], split_generator)
     train_dataloader = DataLoader(
