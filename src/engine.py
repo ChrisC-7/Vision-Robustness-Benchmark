@@ -58,7 +58,7 @@ def train_one_epoch(
     device: str,
 ) -> float:
     model.train()
-    total_loss = 0.0
+    total_loss = torch.zeros((), device=device)  # on-device: no per-batch .item() sync
     n = len(dataloader.dataset)
     for X, y in dataloader:
         X, y = X.to(device), y.to(device)
@@ -67,8 +67,8 @@ def train_one_epoch(
         loss = loss_fn(pred, y)
         loss.backward()
         optimizer.step()
-        total_loss += loss.item() * len(X)
-    return total_loss / n
+        total_loss += loss.detach() * len(X)
+    return total_loss.item() / n
 
 
 def evaluate(
@@ -78,17 +78,17 @@ def evaluate(
     device: str
 ) -> tuple[float, float]:
     model.eval()
-    total_loss = 0.0
-    total_correct = 0
+    total_loss = torch.zeros((), device=device)
+    total_correct = torch.zeros((), dtype=torch.long, device=device)
     n = len(dataloader.dataset)
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X)
             loss = loss_fn(pred, y)
-            total_loss += loss.item() * len(X)
-            total_correct += (pred.argmax(dim=1) == y).sum().item()
-    return total_loss / n, 100 * total_correct / n
+            total_loss += loss * len(X)
+            total_correct += (pred.argmax(dim=1) == y).sum()
+    return total_loss.item() / n, 100 * total_correct.item() / n
 
 
 def fit(

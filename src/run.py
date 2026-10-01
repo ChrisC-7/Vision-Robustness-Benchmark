@@ -46,7 +46,10 @@ def train_run(run_name: str, config: TrainConfig, root: str = "runs") -> Path:
     torch.manual_seed(config.training_seed)
     model = build_model(config.model_name).to(config.device)
     train_loader, val_loader = get_train_val_dataloaders(
-        training_seed=config.training_seed, split_seed=config.split_seed, batch_size=config.batch_size
+        training_seed=config.training_seed,
+        split_seed=config.split_seed,
+        batch_size=config.batch_size,
+        device=config.device,
     )
 
     metrics_path = out_dir / "metrics.jsonl"

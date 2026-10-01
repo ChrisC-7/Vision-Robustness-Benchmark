@@ -1,12 +1,15 @@
 import json
 
+import numpy as np
 import torch
 
+from PIL import Image
 from torch.utils.data import DataLoader, TensorDataset
+from torchvision import transforms
 from pathlib import Path
 
 from src import engine, run
-from src.data import GaussianNoise
+from src.data import GaussianNoise, InMemoryLoader, to_image_tensor
 from src import multiseed
 
 
@@ -23,6 +26,76 @@ def test_gaussian_noise_reproducible_and_clamped():
     assert torch.equal(y_1, y_2)
     assert torch.Tensor.max(y_1) <= 1
     assert torch.Tensor.min(y_1) >=0
+
+def test_in_memory_loader_matches_dataloader_batches():
+    images = torch.randn(23, 3, 4, 4)
+    labels = torch.arange(23)
+    indices = [3, 5, 7, 11, 13, 17, 19, 21, 22, 0, 1, 2, 4]  # a subset, like a random_split part
+
+    class Subset:
+        def __len__(self):
+            return len(indices)
+
+        def __getitem__(self, i):
+            return images[indices[i]], labels[indices[i]]
+
+    reference = DataLoader(
+        Subset(), batch_size=4, shuffle=True, generator=torch.Generator().manual_seed(7)
+    )
+    loader = InMemoryLoader(
+        images, labels, indices, batch_size=4, shuffle=True,
+        generator=torch.Generator().manual_seed(7),
+    )
+    assert len(loader) == len(reference) == 4
+    assert len(loader.dataset) == len(indices)
+
+    for _ in range(2):  # a second epoch checks the shuffle RNG state stays in step
+        for (x_ref, y_ref), (x, y) in zip(reference, loader):
+            assert torch.equal(x_ref, x)
+            assert torch.equal(y_ref, y)
+
+
+def test_in_memory_loader_without_shuffle_keeps_order():
+    images = torch.randn(6, 1, 2, 2)
+    labels = torch.arange(6)
+    loader = InMemoryLoader(images, labels, [4, 1, 5, 0], batch_size=3)
+
+    batches = list(loader)
+    assert [y.tolist() for _, y in batches] == [[4, 1, 5], [0]]
+
+
+def test_to_image_tensor_matches_totensor():
+    rng = np.random.default_rng(0)
+    batch = rng.integers(0, 256, size=(5, 8, 8, 3), dtype=np.uint8)
+
+    expected = torch.stack([transforms.ToTensor()(Image.fromarray(img)) for img in batch])
+
+    assert torch.equal(to_image_tensor(batch), expected)
+
+
+def test_engine_loss_and_accuracy_match_per_batch_reference():
+    torch.manual_seed(0)
+    model = torch.nn.Linear(4, 3)
+    X = torch.randn(10, 4)
+    y = torch.randint(0, 3, (10,))
+    loader = DataLoader(TensorDataset(X, y), batch_size=4)  # batches of 4, 4, 2
+    loss_fn = torch.nn.CrossEntropyLoss()
+
+    with torch.no_grad():
+        per_batch = [(loss_fn(model(xb), yb).item(), len(xb)) for xb, yb in loader]
+        pred = model(X).argmax(dim=1)
+    expected_loss = sum(l * n for l, n in per_batch) / 10
+    expected_acc = 100 * (pred == y).sum().item() / 10
+
+    val_loss, val_acc = engine.evaluate(model, loader, loss_fn, "cpu")
+    assert abs(val_loss - expected_loss) < 1e-6
+    assert val_acc == expected_acc
+
+    # lr=0 keeps the weights fixed, so train_one_epoch must report the same mean loss
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.0)
+    train_loss = engine.train_one_epoch(model, loader, optimizer, loss_fn, "cpu")
+    assert abs(train_loss - expected_loss) < 1e-6
+
 
 def test_fit_keeps_earlier_epoch_on_val_accuracy_tie(monkeypatch):
 
@@ -50,7 +123,7 @@ def test_train_run_writes_config_metrics_and_checkpoint(tmp_path, monkeypatch):
     def fake_build_model(name):
         return torch.nn.Sequential(torch.nn.Flatten(), torch.nn.Linear(4,1))
 
-    def fake_get_train_val_dataloaders(training_seed, split_seed, batch_size):
+    def fake_get_train_val_dataloaders(training_seed, split_seed, batch_size, device):
         t_data = torch.rand(4, 4)
         v_data = torch.rand(2, 4)
         y_t = torch.rand(4, 1)
