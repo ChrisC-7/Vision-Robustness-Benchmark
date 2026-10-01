@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import argparse
 from dataclasses import dataclass, field, replace, asdict
 
 from .run import train_run
@@ -47,8 +48,6 @@ def load_multiseed_config(path = 'configs/multiseed.json'):
 def run_multiseed(config: MultiSeedConfig):
     experiment_dir = Path(config.root) / config.experiment_name
     config_path = experiment_dir / "config.json"
-    if config_path.exists():
-        raise FileExistsError('Already exists such config')
     experiment_dir.mkdir(parents=True, exist_ok=True)
 
     with open(Path(config_path), 'w', encoding="utf-8") as f:
@@ -69,7 +68,7 @@ def run_multiseed(config: MultiSeedConfig):
                 training_seed = seed
             )
             run_name = f'{model}_s{seed}'
-            run_dir = train_run(run_name, train_config, Path(experiment_dir))
+            run_dir = train_run(run_name, train_config, str(experiment_dir))
             eval_result = eval_run(run_dir, eval_config)
             results.append(eval_result)
             amount_current += 1
@@ -80,4 +79,9 @@ def run_multiseed(config: MultiSeedConfig):
             f.write(json.dumps(result) + "\n")
     return results
 
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", default="configs/multiseed.json")
+    args = parser.parse_args()
 
+    run_multiseed(load_multiseed_config(args.config))

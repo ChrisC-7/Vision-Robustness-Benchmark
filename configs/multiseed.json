@@ -10,12 +10,13 @@
         "batch_size": 64,
         "learning_rate": 0.03,
         "momentum": 0.9,
-        "device": "cpu"
+        "device": "cuda"
     },
 
     "eval": {
         "conditions": ["clean", "blur", "noise"],
         "noise_seed": 42,
-        "std": 0.1
+        "std": 0.1,
+        "device": "cuda"
     }
 }
