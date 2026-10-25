@@ -1,6 +1,7 @@
 torch>=2.13
 torchvision>=0.28
 pytest>=9.1
+httpx2>=2.16
 fastapi>=0.141
 uvicorn>=0.52
 python-multipart>=0.0.32

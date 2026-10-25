@@ -57,19 +57,26 @@ CREATE TABLE IF NOT EXISTS eval_results (
 """
 
 
-def get_connection(db_path: str = "experiments.db") -> sqlite3.Connection:
+def get_connection(
+    db_path: str = "experiments.db", check_same_thread: bool = True
+) -> sqlite3.Connection:
     """Opens a tracking database, creating its schema if needed.
 
     Args:
         db_path: Filesystem path to the SQLite file. Pass ``":memory:"``
             for an ephemeral database; the test suite does this so tests
             never touch a file on disk.
+        check_same_thread: Passed through to :func:`sqlite3.connect`. Leave
+            it on unless the connection is opened and used on different
+            threads, as a FastAPI dependency's connection is (see
+            :func:`api.get_db`). It never makes a connection safe to use
+            from two threads *at the same time*.
 
     Returns:
         A connection with row access by column name (``sqlite3.Row``) and
         foreign key enforcement turned on.
     """
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, check_same_thread=check_same_thread)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     conn.executescript(_SCHEMA)
@@ -183,6 +190,41 @@ def record_train_run(conn: sqlite3.Connection, run_dir: str) -> str:
     )
     conn.commit()
     return str(run_dir_path)
+
+
+def list_train_runs(conn: sqlite3.Connection) -> list[dict]:
+    """Lists every recorded training run.
+
+    Args:
+        conn: An open connection from :func:`get_connection`.
+
+    Returns:
+        One dict per ``train_runs`` row, ordered by model then training
+        seed. ``train_config_json`` is returned as stored, undecoded, the
+        same way :func:`query_eval_results` returns ``params_json``.
+    """
+    rows = conn.execute(
+        "SELECT * FROM train_runs ORDER BY model_name, training_seed, run_dir"
+    ).fetchall()
+    return [dict(row) for row in rows]
+
+
+def get_train_run(conn: sqlite3.Connection, run_dir: str) -> Optional[dict]:
+    """Looks up one recorded training run by its ``run_dir``.
+
+    Args:
+        conn: An open connection from :func:`get_connection`.
+        run_dir: The run's directory, normalized the same way
+            :func:`record_train_run` normalized it when recording.
+
+    Returns:
+        The ``train_runs`` row as a dict, or ``None`` if no run is recorded
+        under ``run_dir``.
+    """
+    row = conn.execute(
+        "SELECT * FROM train_runs WHERE run_dir = ?", (str(Path(run_dir)),)
+    ).fetchone()
+    return None if row is None else dict(row)
 
 
 def _resolve_condition_params(condition: str, config: EvalConfig) -> dict[str, Any]:
