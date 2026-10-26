@@ -1,0 +1,633 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Status",
+        "operationId": "status_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predict": {
+      "post": {
+        "summary": "Predict Image",
+        "operationId": "predict_image_predict_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_predict_image_predict_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PredictionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predict/compare": {
+      "post": {
+        "summary": "Compare Models",
+        "operationId": "compare_models_predict_compare_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_compare_models_predict_compare_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PredictionResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Compare Models Predict Compare Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runs": {
+      "get": {
+        "summary": "List Runs",
+        "operationId": "list_runs_runs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RunSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List Runs Runs Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runs/{run_dir}": {
+      "get": {
+        "summary": "Get Run",
+        "operationId": "get_run_runs__run_dir__get",
+        "parameters": [
+          {
+            "name": "run_dir",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Dir"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/results": {
+      "get": {
+        "summary": "List Results",
+        "operationId": "list_results_results_get",
+        "parameters": [
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "simple",
+                    "stronger"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Model"
+            }
+          },
+          {
+            "name": "training_seed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Training Seed"
+            }
+          },
+          {
+            "name": "condition",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "clean",
+                    "blur",
+                    "noise"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Condition"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EvalResult"
+                  },
+                  "title": "Response List Results Results Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_compare_models_predict_compare_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_compare_models_predict_compare_post"
+      },
+      "Body_predict_image_predict_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "simple",
+              "stronger"
+            ],
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "model"
+        ],
+        "title": "Body_predict_image_predict_post"
+      },
+      "EvalResult": {
+        "properties": {
+          "run_dir": {
+            "type": "string",
+            "title": "Run Dir"
+          },
+          "run_name": {
+            "type": "string",
+            "title": "Run Name"
+          },
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "training_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Training Seed"
+          },
+          "eval_id": {
+            "type": "string",
+            "title": "Eval Id"
+          },
+          "noise_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Noise Seed"
+          },
+          "condition": {
+            "type": "string",
+            "enum": [
+              "clean",
+              "blur",
+              "noise"
+            ],
+            "title": "Condition"
+          },
+          "loss": {
+            "type": "number",
+            "title": "Loss"
+          },
+          "accuracy": {
+            "type": "number",
+            "title": "Accuracy"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_dir",
+          "run_name",
+          "model_name",
+          "training_seed",
+          "eval_id",
+          "noise_seed",
+          "condition",
+          "loss",
+          "accuracy",
+          "params"
+        ],
+        "title": "EvalResult"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "models": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "simple",
+                "stronger"
+              ]
+            },
+            "type": "array",
+            "title": "Models"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "models"
+        ],
+        "title": "HealthResponse"
+      },
+      "PredictionResponse": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "predicted_index": {
+            "type": "integer",
+            "title": "Predicted Index"
+          },
+          "predicted_class": {
+            "type": "string",
+            "title": "Predicted Class"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model",
+          "predicted_index",
+          "predicted_class",
+          "confidence"
+        ],
+        "title": "PredictionResponse"
+      },
+      "RunDetail": {
+        "properties": {
+          "run_dir": {
+            "type": "string",
+            "title": "Run Dir"
+          },
+          "run_name": {
+            "type": "string",
+            "title": "Run Name"
+          },
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "training_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Training Seed"
+          },
+          "split_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Split Seed"
+          },
+          "best_epoch": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Epoch"
+          },
+          "best_val_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Val Accuracy"
+          },
+          "train_config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Train Config"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_dir",
+          "run_name",
+          "model_name",
+          "training_seed",
+          "split_seed",
+          "best_epoch",
+          "best_val_accuracy",
+          "train_config"
+        ],
+        "title": "RunDetail"
+      },
+      "RunSummary": {
+        "properties": {
+          "run_dir": {
+            "type": "string",
+            "title": "Run Dir"
+          },
+          "run_name": {
+            "type": "string",
+            "title": "Run Name"
+          },
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "training_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Training Seed"
+          },
+          "split_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Split Seed"
+          },
+          "best_epoch": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Epoch"
+          },
+          "best_val_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Val Accuracy"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_dir",
+          "run_name",
+          "model_name",
+          "training_seed",
+          "split_seed",
+          "best_epoch",
+          "best_val_accuracy"
+        ],
+        "title": "RunSummary"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

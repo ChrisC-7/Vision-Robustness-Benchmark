@@ -60,7 +60,11 @@ def get_db() -> Iterator[sqlite3.Connection]:
 Db = Annotated[sqlite3.Connection, Depends(get_db)]
 
 
-@app.get('/health')
+class HealthResponse(BaseModel):
+    status: Literal["ok"]
+    models: list[ModelName]
+
+@app.get('/health', response_model=HealthResponse)
 def status():
     return {
         "status": "ok",

@@ -54,7 +54,9 @@ Per-seed Δ (pp):
 │   ├── tracking.py   # SQLite tracking of runs and eval results
 │   ├── backfill.py   # record a finished multiseed experiment into the tracking DB
 │   ├── inference.py  # load a checkpoint and classify one image
-│   └── api.py        # FastAPI server: predictions, runs, and eval results
+│   ├── api.py        # FastAPI server: predictions, runs, and eval results
+│   └── export_openapi.py  # write the API schema the web frontend's types come from
+├── web/              # React + TypeScript frontend (see web/README.md)
 ├── scripts/
 │   └── tracking_demo.py  # runnable walkthrough of tracking.py
 ├── configs/
@@ -155,7 +157,7 @@ uvicorn src.api:app --reload
 | `GET /runs/{run_dir}` | one run, plus its full training config; `run_dir` keeps its slashes, e.g. `/runs/runs/multiseed/experiment1/simple_s42` |
 | `GET /results?model=&training_seed=&condition=` | per-condition eval results, every filter optional |
 
-`/runs` and `/results` read the SQLite file at `VISION_DB_PATH`. `multiseed.py` does not record into it, so run `src.backfill` after an experiment finishes; re-running it updates rows instead of duplicating them. Browser requests are accepted only from the comma-separated origins in `VISION_CORS_ORIGINS` (default: the Vite dev server, `http://localhost:5173`). Interactive docs are at `/docs` once the server is up. `inference.py` holds the underlying image preprocessing and prediction logic if you want to call a model directly instead of through the API.
+`/runs` and `/results` read the SQLite file at `VISION_DB_PATH`. `multiseed.py` does not record into it, so run `src.backfill` after an experiment finishes; re-running it updates rows instead of duplicating them. Browser requests are accepted only from the comma-separated origins in `VISION_CORS_ORIGINS` (default: the Vite dev server, `http://localhost:5173`). Interactive docs are at `/docs` once the server is up. The React frontend in `web/` reads these endpoints through TypeScript types generated from the same schema; [`web/README.md`](web/README.md) covers running it and regenerating the types. `inference.py` holds the underlying image preprocessing and prediction logic if you want to call a model directly instead of through the API.
 
 ## Tests
 
@@ -163,7 +165,7 @@ uvicorn src.api:app --reload
 python -m pytest -q tests
 ```
 
-Covers model output contracts, seeded noise reproducibility, output clamping to `[0, 1]`, validation-tie checkpoint selection, run-artifact creation, multi-seed orchestration, the SQLite tracking layer (idempotent writes, filtering by model/seed/condition/param), backfilling an experiment, and the API (filters, 404/422/400 responses, CORS, and concurrent requests against SQLite).
+Covers model output contracts, seeded noise reproducibility, output clamping to `[0, 1]`, validation-tie checkpoint selection, run-artifact creation, multi-seed orchestration, the SQLite tracking layer (idempotent writes, filtering by model/seed/condition/param), backfilling an experiment, the API (filters, 404/422/400 responses, CORS, and concurrent requests against SQLite), and that the committed `web/openapi.json` still matches the API. Frontend checks run from `web/`: `npm run typecheck`, `npm run lint`, `npm test`.
 
 ## Limitations & Next Step
 
