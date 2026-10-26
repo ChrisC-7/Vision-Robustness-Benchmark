@@ -57,6 +57,13 @@ def _png_bytes() -> bytes:
     return buffer.getvalue()
 
 
+def test_health_lists_loaded_models(client):
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok", "models": ["simple", "stronger"]}
+
+
 def test_list_runs_is_sorted_and_hides_server_paths(client):
     response = client.get("/runs")
 
