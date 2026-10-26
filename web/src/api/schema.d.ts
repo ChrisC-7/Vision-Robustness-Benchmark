@@ -173,8 +173,11 @@ export interface components {
         };
         /** PredictionResponse */
         PredictionResponse: {
-            /** Model */
-            model: string;
+            /**
+             * Model
+             * @enum {string}
+             */
+            model: "simple" | "stronger";
             /** Predicted Index */
             predicted_index: number;
             /** Predicted Class */

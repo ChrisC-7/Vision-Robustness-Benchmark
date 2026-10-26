@@ -72,7 +72,7 @@ def status():
     }
 
 class PredictionResponse(BaseModel):
-    model: str
+    model: ModelName
     predicted_index: int
     predicted_class: str
     confidence: float
