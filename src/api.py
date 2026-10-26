@@ -114,7 +114,7 @@ def compare_models(file: Annotated[UploadFile, File()]):
 class RunSummary(BaseModel):
     run_dir: str
     run_name: str
-    model_name: str
+    model_name: ModelName
     training_seed: Optional[int]
     split_seed: Optional[int]
     best_epoch: Optional[int]
@@ -128,7 +128,7 @@ class RunDetail(RunSummary):
 class EvalResult(BaseModel):
     run_dir: str
     run_name: str
-    model_name: str
+    model_name: ModelName
     training_seed: Optional[int]
     eval_id: str
     noise_seed: Optional[int]

@@ -131,8 +131,11 @@ export interface components {
             run_dir: string;
             /** Run Name */
             run_name: string;
-            /** Model Name */
-            model_name: string;
+            /**
+             * Model Name
+             * @enum {string}
+             */
+            model_name: "simple" | "stronger";
             /** Training Seed */
             training_seed: number | null;
             /** Eval Id */
@@ -185,8 +188,11 @@ export interface components {
             run_dir: string;
             /** Run Name */
             run_name: string;
-            /** Model Name */
-            model_name: string;
+            /**
+             * Model Name
+             * @enum {string}
+             */
+            model_name: "simple" | "stronger";
             /** Training Seed */
             training_seed: number | null;
             /** Split Seed */
@@ -206,8 +212,11 @@ export interface components {
             run_dir: string;
             /** Run Name */
             run_name: string;
-            /** Model Name */
-            model_name: string;
+            /**
+             * Model Name
+             * @enum {string}
+             */
+            model_name: "simple" | "stronger";
             /** Training Seed */
             training_seed: number | null;
             /** Split Seed */
