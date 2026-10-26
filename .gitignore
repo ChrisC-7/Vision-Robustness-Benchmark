@@ -9,7 +9,8 @@ __pycache__/
 data/
 
 checkpoints/
-runs/
+# Anchored to the repo root: training artifacts only, not web/src/runs/.
+/runs/
 
 # Tracking DB
 *.db

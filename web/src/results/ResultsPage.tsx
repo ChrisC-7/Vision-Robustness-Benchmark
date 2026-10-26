@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useEvaluations } from '../api/results'
+import { EmptyDatabase, QueryError } from '../components/QueryStates'
 import { AccuracyChart } from './AccuracyChart'
 import { DropChart } from './DropChart'
 import {
@@ -25,24 +26,14 @@ export function ResultsPage() {
 
   if (results.isError) {
     return (
-      <div className="status status-error" role="alert">
-        <p>Couldn't load results: {results.error.message}</p>
-        <button type="button" onClick={() => void results.refetch()} disabled={results.isFetching}>
-          {results.isFetching ? 'Retrying…' : 'Retry'}
-        </button>
-      </div>
+      <QueryError onRetry={() => void results.refetch()} retrying={results.isFetching}>
+        Couldn't load results: {results.error.message}
+      </QueryError>
     )
   }
 
   if (results.data.length === 0) {
-    return (
-      <div className="status" role="status">
-        <p>
-          No evaluation results are recorded yet. From the repository root, run{' '}
-          <code>python -m src.backfill --experiment-dir runs/multiseed/experiment1</code>, then reload.
-        </p>
-      </div>
-    )
+    return <EmptyDatabase nothing="evaluation results" />
   }
 
   return <ResultsView evaluations={results.data} />

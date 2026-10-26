@@ -6,6 +6,8 @@ import { HealthStatus } from './components/HealthStatus'
 // compare page, and neither page's code is in the initial bundle.
 const ResultsPage = lazy(() => import('./results/ResultsPage').then((m) => ({ default: m.ResultsPage })))
 const ComparePage = lazy(() => import('./compare/ComparePage').then((m) => ({ default: m.ComparePage })))
+const RunsPage = lazy(() => import('./runs/RunsPage').then((m) => ({ default: m.RunsPage })))
+const RunDetailPage = lazy(() => import('./runs/RunDetailPage').then((m) => ({ default: m.RunDetailPage })))
 
 function App() {
   return (
@@ -20,6 +22,7 @@ function App() {
             Results
           </NavLink>
           <NavLink to="/compare">Compare</NavLink>
+          <NavLink to="/runs">Runs</NavLink>
         </nav>
       </header>
 
@@ -27,6 +30,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Page title="Results"><ResultsPage /></Page>} />
           <Route path="/compare" element={<Page title="Compare models"><ComparePage /></Page>} />
+          <Route path="/runs" element={<Page title="Training runs"><RunsPage /></Page>} />
+          {/* A splat, not :runDir, because a run_dir contains slashes. */}
+          <Route path="/runs/*" element={<Page title="Training run"><RunDetailPage /></Page>} />
           <Route path="*" element={<Page title="Page not found"><p>Nothing lives at this address.</p></Page>} />
         </Routes>
       </Suspense>

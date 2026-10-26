@@ -403,14 +403,14 @@ h3 {
   overflow-x: auto;
 }
 
-.results-table {
+.data-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
 }
 
-.results-table caption {
+.data-table caption {
   padding-bottom: 0.25rem;
   font-weight: 600;
   text-align: left;
@@ -422,30 +422,110 @@ h3 {
   font-size: 0.8125rem;
 }
 
-.results-table th,
-.results-table td {
+.data-table th,
+.data-table td {
   padding: 0.375rem 0.75rem;
   border-bottom: 1px solid var(--grid);
-  text-align: right;
+  text-align: left;
   white-space: nowrap;
 }
 
-.results-table th:first-child,
-.results-table td:nth-child(2) {
-  text-align: left;
+/* Numbers right-align so their digits line up. */
+.data-table .num {
+  text-align: right;
 }
 
-.results-table thead th {
+.data-table thead th {
   color: var(--muted);
   font-weight: 600;
 }
 
-.results-table tbody th {
+.data-table tbody th {
   font-weight: 400;
 }
 
-.results-table tfoot th,
-.results-table tfoot td {
+.data-table tfoot th,
+.data-table tfoot td {
   border-top: 1px solid var(--axis);
   font-weight: 600;
+}
+
+.data-table a {
+  color: var(--series-1);
+}
+
+/* Run detail */
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+
+.run-detail h3 {
+  font-size: 1.25rem;
+}
+
+.run-detail h4 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+.run-dir {
+  margin: 0.25rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+/* 12rem minimum: wide enough for "StrongerCNN" at tile size, so a phone
+   gets one column instead of two that clip it. */
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.stat-tile {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.stat-tile dt {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.stat-tile dd {
+  margin: 0.125rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.stat-detail {
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.config-list {
+  margin: 0;
+  border-top: 1px solid var(--grid);
+}
+
+.config-list > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 12rem) 1fr;
+  gap: 1rem;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid var(--grid);
+  font-size: 0.875rem;
+}
+
+.config-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
