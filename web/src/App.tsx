@@ -1,24 +1,50 @@
+import { lazy, Suspense, type ReactNode } from 'react'
+import { NavLink, Route, Routes } from 'react-router'
 import { HealthStatus } from './components/HealthStatus'
-import { ResultsPage } from './results/ResultsPage'
+
+// Each page is its own chunk, so Recharts (results only) never loads on the
+// compare page, and neither page's code is in the initial bundle.
+const ResultsPage = lazy(() => import('./results/ResultsPage').then((m) => ({ default: m.ResultsPage })))
+const ComparePage = lazy(() => import('./compare/ComparePage').then((m) => ({ default: m.ComparePage })))
 
 function App() {
   return (
     <main className="app">
-      <header>
-        <h1>Robustness Explorer</h1>
-        <p className="subtitle">
-          How two small CIFAR-10 CNNs hold up under Gaussian blur and noise.
-        </p>
+      <header className="app-header">
+        <div>
+          <h1>Robustness Explorer</h1>
+          <p className="subtitle">How two small CIFAR-10 CNNs hold up under Gaussian blur and noise.</p>
+        </div>
+        <nav aria-label="Pages">
+          <NavLink to="/" end>
+            Results
+          </NavLink>
+          <NavLink to="/compare">Compare</NavLink>
+        </nav>
       </header>
-      <section aria-labelledby="results-heading">
-        <h2 id="results-heading">Results</h2>
-        <ResultsPage />
-      </section>
+
+      <Suspense fallback={<p role="status">Loading…</p>}>
+        <Routes>
+          <Route path="/" element={<Page title="Results"><ResultsPage /></Page>} />
+          <Route path="/compare" element={<Page title="Compare models"><ComparePage /></Page>} />
+          <Route path="*" element={<Page title="Page not found"><p>Nothing lives at this address.</p></Page>} />
+        </Routes>
+      </Suspense>
+
       <section aria-labelledby="backend-heading">
         <h2 id="backend-heading">Backend</h2>
         <HealthStatus />
       </section>
     </main>
+  )
+}
+
+function Page({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section aria-labelledby="page-heading">
+      <h2 id="page-heading">{title}</h2>
+      {children}
+    </section>
   )
 }
 

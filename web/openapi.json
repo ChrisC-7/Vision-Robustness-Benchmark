@@ -420,6 +420,10 @@
         "properties": {
           "model": {
             "type": "string",
+            "enum": [
+              "simple",
+              "stronger"
+            ],
             "title": "Model"
           },
           "predicted_index": {
