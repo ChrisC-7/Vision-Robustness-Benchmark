@@ -17,7 +17,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173. The app calls the API at `VITE_API_BASE_URL` (default `http://127.0.0.1:8000`; see `.env.example`). The API only accepts browser requests from the origins in its `VISION_CORS_ORIGINS`, which defaults to `http://localhost:5173`, so open the app on `localhost`, not `127.0.0.1`.
+Open http://localhost:5173. The results page charts every evaluation recorded in the API's tracking database (fill it with `python -m src.backfill`; see the main README), with filters by model, training seed and corruption, and a table of every charted value. The app calls the API at `VITE_API_BASE_URL` (default `http://127.0.0.1:8000`; see `.env.example`). The API only accepts browser requests from the origins in its `VISION_CORS_ORIGINS`, which defaults to `http://localhost:5173`, so open the app on `localhost`, not `127.0.0.1`.
 
 ## Scripts
 

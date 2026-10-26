@@ -307,6 +307,10 @@
           },
           "model_name": {
             "type": "string",
+            "enum": [
+              "simple",
+              "stronger"
+            ],
             "title": "Model Name"
           },
           "training_seed": {
@@ -452,6 +456,10 @@
           },
           "model_name": {
             "type": "string",
+            "enum": [
+              "simple",
+              "stronger"
+            ],
             "title": "Model Name"
           },
           "training_seed": {
@@ -529,6 +537,10 @@
           },
           "model_name": {
             "type": "string",
+            "enum": [
+              "simple",
+              "stronger"
+            ],
             "title": "Model Name"
           },
           "training_seed": {
