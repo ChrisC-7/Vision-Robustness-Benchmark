@@ -12,3 +12,18 @@ export const api = createClient<paths>({
   // Looking it up per request is what lets tests stub it with vi.stubGlobal.
   fetch: (request) => globalThis.fetch(request),
 })
+
+/**
+ * An HTTP error response. openapi-fetch never throws on one, so the fetch
+ * functions throw this instead, keeping the status so pages can tell a
+ * missing record (404) from an outage.
+ */
+export class ApiError extends Error {
+  readonly status: number
+
+  constructor(request: string, status: number) {
+    super(`${request} failed with HTTP ${status}`)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}

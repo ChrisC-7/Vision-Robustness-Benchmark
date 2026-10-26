@@ -1,6 +1,7 @@
 import { keepPreviousData, skipToken, useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { comparePredictions, type Prediction } from '../api/compare'
+import { QueryError } from '../components/QueryStates'
 import { SERIES_COLORS } from '../results/chartStyle'
 import { MODELS, MODEL_LABELS, type Condition, type Corruption } from '../results/evaluations'
 import type { Pixels } from './corruptions'
@@ -122,12 +123,9 @@ export function ComparePage() {
             Classifying…
           </p>
         ) : predictions.isError ? (
-          <div className="status status-error" role="alert">
-            <p>Couldn't get predictions: {predictions.error.message}</p>
-            <button type="button" onClick={() => void predictions.refetch()} disabled={predictions.isFetching}>
-              {predictions.isFetching ? 'Retrying…' : 'Retry'}
-            </button>
-          </div>
+          <QueryError onRetry={() => void predictions.refetch()} retrying={predictions.isFetching}>
+            Couldn't get predictions: {predictions.error.message}
+          </QueryError>
         ) : (
           <PredictionList predictions={predictions.data} stale={predictions.isPlaceholderData} />
         )}

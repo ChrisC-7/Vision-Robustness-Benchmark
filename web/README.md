@@ -17,7 +17,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173. The results page charts every evaluation recorded in the API's tracking database (fill it with `python -m src.backfill`; see the main README), with filters by model, training seed and corruption, and a table of every charted value. The compare page (`/compare`) takes any image, squashes it to the 32×32 the models see, applies the benchmark's Gaussian blur or noise in the browser with a slider for its strength, and shows both models' predictions side by side. The app calls the API at `VITE_API_BASE_URL` (default `http://127.0.0.1:8000`; see `.env.example`). The API only accepts browser requests from the origins in its `VISION_CORS_ORIGINS`, which defaults to `http://localhost:5173`, so open the app on `localhost`, not `127.0.0.1`.
+Open http://localhost:5173. The results page charts every evaluation recorded in the API's tracking database (fill it with `python -m src.backfill`; see the main README), with filters by model, training seed and corruption, and a table of every charted value. The compare page (`/compare`) takes any image, squashes it to the 32×32 the models see, applies the benchmark's Gaussian blur or noise in the browser with a slider for its strength, and shows both models' predictions side by side. The runs page (`/runs`) lists every recorded training run with its best epoch and validation accuracy; each links to `/runs/<run_dir>`, which shows that run's full training config. The app calls the API at `VITE_API_BASE_URL` (default `http://127.0.0.1:8000`; see `.env.example`). The API only accepts browser requests from the origins in its `VISION_CORS_ORIGINS`, which defaults to `http://localhost:5173`, so open the app on `localhost`, not `127.0.0.1`.
 
 ## Scripts
 

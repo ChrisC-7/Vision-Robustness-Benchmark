@@ -1,5 +1,6 @@
 import { apiBaseUrl } from '../api/client'
 import { useHealth } from '../api/health'
+import { QueryError } from './QueryStates'
 
 export function HealthStatus() {
   const health = useHealth()
@@ -14,14 +15,9 @@ export function HealthStatus() {
 
   if (health.isError) {
     return (
-      <div className="status status-error" role="alert">
-        <p>
-          Can't reach the API at <code>{apiBaseUrl}</code>: {health.error.message}
-        </p>
-        <button type="button" onClick={() => void health.refetch()} disabled={health.isFetching}>
-          {health.isFetching ? 'Retrying…' : 'Retry'}
-        </button>
-      </div>
+      <QueryError onRetry={() => void health.refetch()} retrying={health.isFetching}>
+        Can't reach the API at <code>{apiBaseUrl}</code>: {health.error.message}
+      </QueryError>
     )
   }
 

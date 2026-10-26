@@ -1,4 +1,4 @@
-import { api } from './client'
+import { api, ApiError } from './client'
 import type { components } from './schema'
 
 export type Prediction = components['schemas']['PredictionResponse']
@@ -15,8 +15,6 @@ export async function comparePredictions(image: Blob): Promise<Prediction[]> {
       return form
     },
   })
-  if (data === undefined) {
-    throw new Error(`POST /predict/compare failed with HTTP ${response.status}`)
-  }
+  if (data === undefined) throw new ApiError('POST /predict/compare', response.status)
   return data
 }

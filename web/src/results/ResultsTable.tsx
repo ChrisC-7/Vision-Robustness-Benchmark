@@ -26,19 +26,19 @@ export function ResultsTable({ evaluations, models, corruptions }: Props) {
   return (
     <>
       <div className="table-scroll">
-        <table className="results-table" aria-describedby="results-table-note">
+        <table className="data-table" aria-describedby="results-table-note">
           <caption>Per-run results</caption>
           <thead>
             <tr>
               <th scope="col">Model</th>
               <th scope="col">Seed</th>
               {conditions.map((condition) => (
-                <th scope="col" key={condition}>
+                <th scope="col" className="num" key={condition}>
                   {CONDITION_LABELS[condition]}
                 </th>
               ))}
               {corruptions.map((corruption) => (
-                <th scope="col" key={`${corruption}-drop`}>
+                <th scope="col" className="num" key={`${corruption}-drop`}>
                   {CONDITION_LABELS[corruption]} Δ
                 </th>
               ))}
@@ -50,10 +50,14 @@ export function ResultsTable({ evaluations, models, corruptions }: Props) {
                 <th scope="row">{MODEL_LABELS[evaluation.model]}</th>
                 <td>{seedLabel(evaluation.trainingSeed)}</td>
                 {conditions.map((condition) => (
-                  <td key={condition}>{formatAccuracy(evaluation.accuracy[condition])}</td>
+                  <td className="num" key={condition}>
+                    {formatAccuracy(evaluation.accuracy[condition])}
+                  </td>
                 ))}
                 {corruptions.map((corruption) => (
-                  <td key={`${corruption}-drop`}>{formatDrop(accuracyDrop(evaluation, corruption))}</td>
+                  <td className="num" key={`${corruption}-drop`}>
+                    {formatDrop(accuracyDrop(evaluation, corruption))}
+                  </td>
                 ))}
               </tr>
             ))}
@@ -70,10 +74,14 @@ export function ResultsTable({ evaluations, models, corruptions }: Props) {
                   <th scope="row">{MODEL_LABELS[model]}</th>
                   <td>Mean</td>
                   {conditions.map((condition) => (
-                    <td key={condition}>{formatSummary(accuracy(condition), formatAccuracy)}</td>
+                    <td className="num" key={condition}>
+                      {formatSummary(accuracy(condition), formatAccuracy)}
+                    </td>
                   ))}
                   {corruptions.map((corruption) => (
-                    <td key={`${corruption}-drop`}>{formatSummary(drop(corruption), formatDrop)}</td>
+                    <td className="num" key={`${corruption}-drop`}>
+                      {formatSummary(drop(corruption), formatDrop)}
+                    </td>
                   ))}
                 </tr>
               )

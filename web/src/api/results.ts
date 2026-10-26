@@ -1,12 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { groupEvaluations, type EvalResult } from '../results/evaluations'
-import { api } from './client'
+import { api, ApiError } from './client'
 
 export async function fetchResults(): Promise<EvalResult[]> {
   const { data, response } = await api.GET('/results')
-  if (data === undefined) {
-    throw new Error(`GET /results failed with HTTP ${response.status}`)
-  }
+  if (data === undefined) throw new ApiError('GET /results', response.status)
   return data
 }
 
