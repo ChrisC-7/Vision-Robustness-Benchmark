@@ -1,6 +1,10 @@
 # Vision Robustness Benchmark
 
-A reproducible PyTorch benchmark measuring how CNN architecture affects CIFAR-10 classification accuracy under image corruptions (Gaussian blur, Gaussian noise).
+[![CI](https://github.com/ChrisC-7/Vision-Robustness-Benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/ChrisC-7/Vision-Robustness-Benchmark/actions/workflows/ci.yml)
+
+A reproducible PyTorch benchmark measuring how CNN architecture affects CIFAR-10 classification accuracy under image corruptions (Gaussian blur, Gaussian noise). The results are served by a FastAPI backend and explored in a React + TypeScript web app ([`web/`](web/README.md)).
+
+![The web app's results page: accuracy by condition, per-seed accuracy drops under blur and noise, and a table of every run](docs/results-page.png)
 
 ## Research Question
 
@@ -57,12 +61,17 @@ Per-seed Δ (pp):
 │   ├── api.py        # FastAPI server: predictions, runs, and eval results
 │   └── export_openapi.py  # write the API schema the web frontend's types come from
 ├── web/              # React + TypeScript frontend (see web/README.md)
+├── runs/multiseed/experiment1/  # the published experiment: configs, metrics, results, and the two served checkpoints
 ├── scripts/
 │   └── tracking_demo.py  # runnable walkthrough of tracking.py
 ├── configs/
 │   └── multiseed.json    # example multiseed.run_multiseed() config
+├── deploy/huggingface/   # deploys the API to a Hugging Face Docker Space
+├── .github/workflows/ci.yml  # tests, web checks, e2e, and the API deploy
 ├── tests/
+├── Dockerfile        # the API image: CPU-only PyTorch, checkpoints, backfilled database
 ├── requirements.txt
+├── requirements-cpu.txt  # pinned CPU-only PyTorch, installed first in CI and Docker
 ├── .env.example      # env vars api.py needs at startup
 └── README.md
 ```
@@ -77,7 +86,7 @@ python -m pip install -r requirements.txt
 python -m pytest -q tests
 ```
 
-CIFAR-10 downloads automatically on first training or evaluation run.
+On a machine without a CUDA GPU, run `python -m pip install -r requirements-cpu.txt` first; it installs the pinned CPU-only PyTorch, a much smaller download. CIFAR-10 downloads automatically on first training or evaluation run.
 
 ## Usage
 
@@ -159,13 +168,22 @@ uvicorn src.api:app --reload
 
 `/runs` and `/results` read the SQLite file at `VISION_DB_PATH`. `multiseed.py` does not record into it, so run `src.backfill` after an experiment finishes; re-running it updates rows instead of duplicating them. Browser requests are accepted only from the comma-separated origins in `VISION_CORS_ORIGINS` (default: the Vite dev server, `http://localhost:5173`). Interactive docs are at `/docs` once the server is up. The React frontend in `web/` reads these endpoints through TypeScript types generated from the same schema; [`web/README.md`](web/README.md) covers running it and regenerating the types. `inference.py` holds the underlying image preprocessing and prediction logic if you want to call a model directly instead of through the API.
 
+## Deployment
+
+The API runs on a Hugging Face Docker Space, and the web app on Vercel.
+
+- **API.** The [`Dockerfile`](Dockerfile) installs CPU-only PyTorch, copies the published experiment from `runs/multiseed/experiment1`, and backfills the tracking database while the image builds, so the container starts with every run and result already loaded. On each push to `main` that passes CI, the `deploy-api` job in [`ci.yml`](.github/workflows/ci.yml) uploads the build context to the Space, which then rebuilds. It is skipped until the repository has an `HF_TOKEN` secret (a Hugging Face write token) and an `HF_SPACE` variable (`user/space-name`). An optional `FRONTEND_ORIGIN` variable becomes the Space's `VISION_CORS_ORIGINS`. To see exactly what would be uploaded, run `python deploy/huggingface/deploy.py --stage-only /tmp/space`.
+- **Web app.** Vercel builds `web/` from GitHub, with `VITE_API_BASE_URL` set to the Space's URL. [`web/vercel.json`](web/vercel.json) sends every path to `index.html`, so reloading `/compare` or a run's page works.
+
 ## Tests
 
 ```bash
 python -m pytest -q tests
 ```
 
-Covers model output contracts, seeded noise reproducibility, output clamping to `[0, 1]`, validation-tie checkpoint selection, run-artifact creation, multi-seed orchestration, the SQLite tracking layer (idempotent writes, filtering by model/seed/condition/param), backfilling an experiment, the API (filters, 404/422/400 responses, CORS, and concurrent requests against SQLite), and that the committed `web/openapi.json` still matches the API. Frontend checks run from `web/`: `npm run typecheck`, `npm run lint`, `npm test`.
+Covers model output contracts, seeded noise reproducibility, output clamping to `[0, 1]`, validation-tie checkpoint selection, run-artifact creation, multi-seed orchestration, the SQLite tracking layer (idempotent writes, filtering by model/seed/condition/param), backfilling an experiment, the API (filters, 404/422/400 responses, CORS, and concurrent requests against SQLite), and that the committed `web/openapi.json` still matches the API. Frontend checks run from `web/`: `npm run typecheck`, `npm run lint`, `npm test`, and `npm run test:e2e` (Playwright, against the real API and checkpoints).
+
+CI runs all of these on every push and pull request: pytest; the web checks plus a production build; a check that the generated TypeScript types match `web/openapi.json`; and the Playwright tests in Chromium.
 
 ## Limitations & Next Step
 

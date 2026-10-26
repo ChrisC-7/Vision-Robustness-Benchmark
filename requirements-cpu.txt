@@ -1,0 +1,6 @@
+# CPU-only PyTorch, for CI and the deployed API. The default PyPI wheels for
+# Linux bundle CUDA, several GB that a CPU machine never uses. Pinned to the
+# versions the benchmark was run with; install this before requirements.txt.
+--index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1
+torchvision==0.29.1

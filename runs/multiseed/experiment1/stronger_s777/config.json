@@ -1,0 +1,12 @@
+{
+  "model_name": "stronger",
+  "training_seed": 777,
+  "split_seed": 42,
+  "batch_size": 64,
+  "learning_rate": 0.03,
+  "momentum": 0.9,
+  "epochs": 30,
+  "device": "cuda",
+  "optimizer": "SGD",
+  "checkpoint_selection": "best validation accuracy; checkpoint replaced only on strict improvement, so ties keep the earlier epoch"
+}
