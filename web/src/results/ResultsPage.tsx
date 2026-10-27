@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useEvaluations } from '../api/results'
-import { EmptyDatabase, QueryError } from '../components/QueryStates'
+import { EmptyDatabase, Loading, QueryError } from '../components/QueryStates'
 import { AccuracyChart } from './AccuracyChart'
 import { DropChart } from './DropChart'
 import {
@@ -21,7 +21,7 @@ export function ResultsPage() {
   const results = useEvaluations()
 
   if (results.isPending) {
-    return <p role="status">Loading results…</p>
+    return <Loading>Loading results…</Loading>
   }
 
   if (results.isError) {

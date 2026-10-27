@@ -92,27 +92,5 @@ jobs:
           path: web/playwright-report
           retention-days: 7
 
-  deploy-api:
-    name: Deploy API to Hugging Face
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [python, web, e2e]
-    runs-on: ubuntu-latest
-    env:
-      HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      HF_SPACE: ${{ vars.HF_SPACE }}
-      FRONTEND_ORIGIN: ${{ vars.FRONTEND_ORIGIN }}
-    steps:
-      - name: Skip unless the Space is configured
-        if: env.HF_TOKEN == '' || env.HF_SPACE == ''
-        run: echo "::notice::Set the HF_TOKEN secret and the HF_SPACE variable to deploy the API."
-      - uses: actions/checkout@v7
-        if: env.HF_TOKEN != '' && env.HF_SPACE != ''
-      - uses: actions/setup-python@v7
-        if: env.HF_TOKEN != '' && env.HF_SPACE != ''
-        with:
-          python-version: '3.12'
-      - name: Upload the build context to the Space
-        if: env.HF_TOKEN != '' && env.HF_SPACE != ''
-        run: |
-          pip install huggingface_hub==2.3.0
-          python deploy/huggingface/deploy.py
+# Deployment is not a job here: Render deploys the API (render.yaml, once
+# these checks pass) and Vercel deploys web/, both straight from GitHub.

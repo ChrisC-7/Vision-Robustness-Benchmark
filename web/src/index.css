@@ -265,6 +265,10 @@ h3 {
   margin: 0;
 }
 
+.status .hint {
+  margin-top: 0.25rem;
+}
+
 .status-ok {
   border-left-color: var(--ok);
 }
