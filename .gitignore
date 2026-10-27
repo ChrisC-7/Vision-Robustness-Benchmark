@@ -9,8 +9,19 @@ __pycache__/
 data/
 
 checkpoints/
-# Anchored to the repo root: training artifacts only, not web/src/runs/.
-/runs/
+
+# Training artifacts stay local (anchored, so web/src/runs/ is unaffected),
+# except the published experiment1: its configs, metrics and results, plus
+# the two checkpoints the API serves. Git cannot re-include a file inside an
+# ignored directory, so each level is ignored by contents (dir/*) and the
+# one path to keep is re-included before going a level deeper.
+/runs/*
+!/runs/multiseed/
+/runs/multiseed/*
+!/runs/multiseed/experiment1/
+/runs/multiseed/experiment1/*/best.pt
+!/runs/multiseed/experiment1/simple_s42/best.pt
+!/runs/multiseed/experiment1/stronger_s42/best.pt
 
 # Tracking DB
 *.db

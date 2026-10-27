@@ -1,0 +1,1 @@
+{"run_dir": "runs/multiseed/experiment1/stronger_s42", "model": "stronger", "conditions": {"clean": {"loss": 1.018097265625, "accuracy": 68.08}, "blur": {"loss": 1.533287109375, "accuracy": 49.67}, "noise": {"loss": 1.3147529296875, "accuracy": 58.95}}}

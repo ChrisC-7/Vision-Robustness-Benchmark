@@ -1,0 +1,37 @@
+{
+    "models": [
+        "simple",
+        "stronger"
+    ],
+    "training_seeds": [
+        42,
+        123,
+        456,
+        777
+    ],
+    "root": "runs/multiseed",
+    "experiment_name": "experiment1",
+    "base_train_config": {
+        "model_name": "simple",
+        "training_seed": 42,
+        "split_seed": 42,
+        "batch_size": 64,
+        "learning_rate": 0.03,
+        "momentum": 0.9,
+        "epochs": 30,
+        "device": "cuda"
+    },
+    "eval_config": {
+        "conditions": [
+            "clean",
+            "blur",
+            "noise"
+        ],
+        "kernel_size": 5,
+        "noise_seed": 42,
+        "mean": 0.0,
+        "std": 0.1,
+        "batch_size": 64,
+        "device": "cuda"
+    }
+}

@@ -1,0 +1,1 @@
+{"run_dir": "runs/multiseed/experiment1/simple_s42", "model": "simple", "conditions": {"clean": {"loss": 1.7675001953125, "accuracy": 41.06}, "blur": {"loss": 1.9800275390625, "accuracy": 28.49}, "noise": {"loss": 3.19228671875, "accuracy": 28.96}}}

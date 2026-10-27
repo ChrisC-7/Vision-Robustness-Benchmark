@@ -1,0 +1,8 @@
+# An allowlist: only what the Dockerfile copies. Keeps data/ (CIFAR-10),
+# .venv/ and web/node_modules/ out of the build context.
+*
+!requirements.txt
+!requirements-cpu.txt
+!src/
+!runs/multiseed/experiment1/
+**/__pycache__
