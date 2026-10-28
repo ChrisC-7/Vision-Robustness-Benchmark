@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router'
 import { isNotFound, useRun, type RunDetail } from '../api/runs'
-import { QueryError } from '../components/QueryStates'
+import { Loading, QueryError } from '../components/QueryStates'
 import { MODEL_LABELS, seedLabel } from '../results/evaluations'
 import { formatAccuracy } from '../results/format'
 
@@ -16,7 +16,7 @@ export function RunDetailPage() {
         ← All runs
       </Link>
       {run.isPending ? (
-        <p role="status">Loading run…</p>
+        <Loading>Loading run…</Loading>
       ) : run.isError ? (
         isNotFound(run.error) ? (
           <div className="status" role="status">

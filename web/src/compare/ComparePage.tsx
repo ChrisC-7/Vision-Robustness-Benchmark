@@ -1,7 +1,7 @@
 import { keepPreviousData, skipToken, useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { comparePredictions, type Prediction } from '../api/compare'
-import { QueryError } from '../components/QueryStates'
+import { Loading, QueryError } from '../components/QueryStates'
 import { SERIES_COLORS } from '../results/chartStyle'
 import { MODELS, MODEL_LABELS, type Condition, type Corruption } from '../results/evaluations'
 import type { Pixels } from './corruptions'
@@ -119,9 +119,7 @@ export function ComparePage() {
         {image === undefined ? (
           <p className="status">Choose an image to see both models' predictions.</p>
         ) : predictions.isPending ? (
-          <p className="status" role="status">
-            Classifying…
-          </p>
+          <Loading>Classifying…</Loading>
         ) : predictions.isError ? (
           <QueryError onRetry={() => void predictions.refetch()} retrying={predictions.isFetching}>
             Couldn't get predictions: {predictions.error.message}

@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 import { useRuns } from '../api/runs'
-import { EmptyDatabase, QueryError } from '../components/QueryStates'
+import { EmptyDatabase, Loading, QueryError } from '../components/QueryStates'
 import { MODEL_LABELS, seedLabel } from '../results/evaluations'
 import { formatAccuracy } from '../results/format'
 import { experimentName, runPath } from './runPath'
@@ -9,7 +9,7 @@ export function RunsPage() {
   const runs = useRuns()
 
   if (runs.isPending) {
-    return <p role="status">Loading runs…</p>
+    return <Loading>Loading runs…</Loading>
   }
 
   if (runs.isError) {

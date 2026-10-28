@@ -66,10 +66,10 @@ Per-seed Δ (pp):
 │   └── tracking_demo.py  # runnable walkthrough of tracking.py
 ├── configs/
 │   └── multiseed.json    # example multiseed.run_multiseed() config
-├── deploy/huggingface/   # deploys the API to a Hugging Face Docker Space
-├── .github/workflows/ci.yml  # tests, web checks, e2e, and the API deploy
+├── .github/workflows/ci.yml  # tests, web checks, and e2e on every push and PR
 ├── tests/
 ├── Dockerfile        # the API image: CPU-only PyTorch, checkpoints, backfilled database
+├── render.yaml       # deploys that image to Render once CI passes
 ├── requirements.txt
 ├── requirements-cpu.txt  # pinned CPU-only PyTorch, installed first in CI and Docker
 ├── .env.example      # env vars api.py needs at startup
@@ -170,10 +170,11 @@ uvicorn src.api:app --reload
 
 ## Deployment
 
-The API runs on a Hugging Face Docker Space, and the web app on Vercel.
+The API runs on Render and the web app on Vercel. Both deploy straight from GitHub, so the repository holds no deploy credentials.
 
-- **API.** The [`Dockerfile`](Dockerfile) installs CPU-only PyTorch, copies the published experiment from `runs/multiseed/experiment1`, and backfills the tracking database while the image builds, so the container starts with every run and result already loaded. On each push to `main` that passes CI, the `deploy-api` job in [`ci.yml`](.github/workflows/ci.yml) uploads the build context to the Space, which then rebuilds. It is skipped until the repository has an `HF_TOKEN` secret (a Hugging Face write token) and an `HF_SPACE` variable (`user/space-name`). An optional `FRONTEND_ORIGIN` variable becomes the Space's `VISION_CORS_ORIGINS`. To see exactly what would be uploaded, run `python deploy/huggingface/deploy.py --stage-only /tmp/space`.
-- **Web app.** Vercel builds `web/` from GitHub, with `VITE_API_BASE_URL` set to the Space's URL. [`web/vercel.json`](web/vercel.json) sends every path to `index.html`, so reloading `/compare` or a run's page works.
+- **API.** The [`Dockerfile`](Dockerfile) installs CPU-only PyTorch, copies the published experiment from `runs/multiseed/experiment1`, and backfills the tracking database while the image builds, so the container starts with every run and result already loaded. [`render.yaml`](render.yaml) is a Render Blueprint for that image. It uses the free plan, health-checks `/health`, and sets `VISION_CORS_ORIGINS` to the web app's origin. Its `autoDeployTrigger: checksPass` setting means a commit to `main` is deployed only after its CI checks pass. A free instance sleeps after 15 idle minutes, so the first request after a quiet spell takes about a minute while it wakes. The web app tells visitors so when a request is slow.
+- **Web app.** Vercel builds `web/` from GitHub, with `VITE_API_BASE_URL` set to the API's URL. [`web/vercel.json`](web/vercel.json) sends every path to `index.html`, so reloading `/compare` or a run's page works.
+- **Locally.** To build and run the same image, run `docker build -t robustness-api .` and then `docker run -p 8000:8000 robustness-api`.
 
 ## Tests
 
