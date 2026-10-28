@@ -4,6 +4,8 @@
 
 A reproducible PyTorch benchmark measuring how CNN architecture affects CIFAR-10 classification accuracy under image corruptions (Gaussian blur, Gaussian noise). The results are served by a FastAPI backend and explored in a React + TypeScript web app ([`web/`](web/README.md)).
 
+**Live demo:** [web app](https://vision-robustness-benchmark.vercel.app) · [API docs](https://robustness-explorer-api.onrender.com/docs). The API runs on Render's free tier, which sleeps when idle, so the first request after a quiet spell takes about a minute.
+
 ![The web app's results page: accuracy by condition, per-seed accuracy drops under blur and noise, and a table of every run](docs/results-page.png)
 
 ## Research Question
